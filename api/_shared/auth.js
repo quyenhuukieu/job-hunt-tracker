@@ -4,71 +4,24 @@ module.exports = function authenticate(context, req) {
 
     try {
 
-        const authHeader = req.headers.authorization;
+        const header = req.headers.authorization;
 
-        if (!authHeader) {
-
-            context.res = {
-
-                status: 401,
-
-                body: {
-                    success: false,
-                    error: "Missing Authorization header"
-                }
-
-            };
-
+        if (!header) {
+            context.res = { status: 401, body: { error: "Missing token" }};
             return null;
         }
 
-
-        const token = authHeader.split(" ")[1];
-
-
-        if (!token) {
-
-            context.res = {
-
-                status: 401,
-
-                body: {
-                    success: false,
-                    error: "Missing token"
-                }
-
-            };
-
-            return null;
-        }
-
+        const token = header.split(" ")[1];
 
         const decoded = jwt.verify(
-
             token,
-            process.env.JWT_SECRET
-
+            process.env.JWT_ACCESS_SECRET
         );
-
 
         return decoded;
 
-
-    } catch (error) {
-
-        context.res = {
-
-            status: 401,
-
-            body: {
-                success: false,
-                error: "Invalid or expired token"
-            }
-
-        };
-
+    } catch {
+        context.res = { status: 401, body: { error: "Invalid or expired token" }};
         return null;
-
     }
-
 };

@@ -64,6 +64,47 @@ API Route
  ↓
 Database query filtered by user
 
+# Below is a complete production-ready JWT + Refresh Token system for your stack:
+
+Backend: Microsoft Azure Functions
+Database: Neon PostgreSQL
+Frontend: React
+
+This includes:
+
+• Session table
+• Secure login
+• Access + Refresh tokens
+• Refresh endpoint
+• Logout endpoint
+• Token rotation
+• DB-backed session revocation
+
+Architecture Overview (Enterprise Pattern)
+Login
+  ↓
+Access Token (15m)
+Refresh Token (30d, stored in DB)
+
+Access expires
+  ↓
+POST /auth/refresh
+  ↓
+New Access Token
+  ↓
+Old refresh token rotated
+
+Logout
+  ↓
+Delete refresh token from DB
+
+This allows:
+✅ Short access token lifetime
+✅ Long-lived sessions
+✅ Session revocation
+✅ Multi-device logout
+✅ Database-backed security
+
 # Next upgrade
 
 Need to implement / upgrade / add: Role-based access control (RBAC) and Refresh tokens, to make it enterprise-level auth

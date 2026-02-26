@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-import useAuth from "../auth/useAuth";
+import { useAuth } from "../context/useAuth";
 
 
 export default function LoginPage() {

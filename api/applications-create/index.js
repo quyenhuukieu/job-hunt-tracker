@@ -1,14 +1,27 @@
 const { Pool } = require("pg");
 
+const authenticate = require("../_shared/auth");
+
 let pool;
 
 module.exports = async function (context, req) {
 
     context.log("POST /api/applications called");
 
+
+    // STEP 1 — Authenticate user
+    const user = authenticate(context, req);
+
+    if (!user) {
+
+        return;
+
+    }
+
+
     try {
 
-        // Initialize pool once
+        // STEP 2 — Create pool if not exists
         if (!pool) {
 
             pool = new Pool({
@@ -28,23 +41,21 @@ module.exports = async function (context, req) {
         }
 
 
-        // Extract request body
+        // STEP 3 — Extract request body
         const {
 
-            user_id,
             company_name,
             job_title,
             location,
             salary_range,
             job_url,
-            applied_date,
             notes
 
-        } = req.body || {};
+        } = req.body;
 
 
-        // Validate required fields
-        if (!user_id || !company_name || !job_title) {
+        // STEP 4 — Validate required fields
+        if (!company_name || !job_title) {
 
             context.res = {
 
@@ -53,8 +64,7 @@ module.exports = async function (context, req) {
                 body: {
 
                     success: false,
-
-                    error: "Missing required fields: user_id, company_name, job_title"
+                    error: "company_name and job_title are required"
 
                 }
 
@@ -65,146 +75,69 @@ module.exports = async function (context, req) {
         }
 
 
-        // Default status = Applied (id = 2)
-        const defaultStatusId = 2;
+        // STEP 5 — Insert securely using JWT userId
+        const result = await pool.query(
+
+            `
+            INSERT INTO applications
+            (
+                user_id,
+                company_name,
+                job_title,
+                location,
+                salary_range,
+                job_url,
+                notes,
+                current_status_id
+            )
+
+            VALUES
+            ($1,$2,$3,$4,$5,$6,$7,1)
+
+            RETURNING *
+            `,
+
+            [
+
+                user.userId, // SECURE — from JWT
+                company_name,
+                job_title,
+                location || null,
+                salary_range || null,
+                job_url || null,
+                notes || null
+
+            ]
+
+        );
 
 
-        // Begin transaction
-        const client = await pool.connect();
+        // STEP 6 — Return success
+        context.res = {
 
-        try {
+            status: 201,
 
-            await client.query("BEGIN");
+            body: {
 
+                success: true,
 
-            // Insert application
-            const insertApplicationQuery = `
+                message: "Application created",
 
-                INSERT INTO applications (
+                data: result.rows[0]
 
-                    user_id,
-                    company_name,
-                    job_title,
-                    location,
-                    salary_range,
-                    job_url,
-                    applied_date,
-                    notes,
-                    current_status_id
+            }
 
-                )
-
-                VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9)
-
-                RETURNING *
-
-            `;
-
-
-            const applicationResult = await client.query(
-
-                insertApplicationQuery,
-
-                [
-
-                    user_id,
-                    company_name,
-                    job_title,
-                    location || null,
-                    salary_range || null,
-                    job_url || null,
-                    applied_date || null,
-                    notes || null,
-                    defaultStatusId
-
-                ]
-
-            );
-
-
-            const application = applicationResult.rows[0];
-
-
-            // Insert status history
-            const statusHistoryQuery = `
-
-                INSERT INTO application_status_history (
-
-                    application_id,
-                    status_id,
-                    changed_by
-
-                )
-
-                VALUES ($1,$2,$3)
-
-            `;
-
-
-            await client.query(
-
-                statusHistoryQuery,
-
-                [
-
-                    application.id,
-                    defaultStatusId,
-                    user_id
-
-                ]
-
-            );
-
-
-            await client.query("COMMIT");
-
-
-            context.res = {
-
-                status: 201,
-
-                headers: {
-                    "Content-Type": "application/json"
-                },
-
-                body: {
-
-                    success: true,
-
-                    message: "Application created successfully",
-
-                    data: application
-
-                }
-
-            };
-
-
-        } catch (error) {
-
-            await client.query("ROLLBACK");
-
-            throw error;
-
-        } finally {
-
-            client.release();
-
-        }
+        };
 
 
     } catch (error) {
 
-        context.log.error("Create application error:", error);
+        context.log.error(error);
 
 
         context.res = {
 
             status: 500,
-
-            headers: {
-                "Content-Type": "application/json"
-            },
 
             body: {
 

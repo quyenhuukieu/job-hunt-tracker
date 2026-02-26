@@ -38,6 +38,32 @@ Receive JWT
  ↓
 Access protected APIs
 
+# JWT Authentication Middleware
+
+JWT middleware is the security gatekeeper of your API.
+
+It automatically:
+- Verifies the JWT is valid
+- Extracts the user identity
+- Blocks unauthorized access
+- Ensures users only access their own data
+
+Without it, your SaaS is completely insecure.
+
+This is required in any production backend running on Microsoft Azure with a database like Neon.
+
+Production Architecture Flow
+
+Request
+ ↓
+JWT Middleware
+ ↓
+Verified User ID
+ ↓
+API Route
+ ↓
+Database query filtered by user
+
 # Next upgrade
 
 Need to implement / upgrade / add: Role-based access control (RBAC) and Refresh tokens, to make it enterprise-level auth

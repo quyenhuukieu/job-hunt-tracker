@@ -19,7 +19,7 @@ export const AuthProvider = ({ children }) => {
 
   // ---------- Login ----------
   const login = async (email, password) => {
-    const response = await fetch("/api/auth-login", {
+    const response = await fetch("/api/auth/login", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ email, password }),
@@ -39,7 +39,7 @@ export const AuthProvider = ({ children }) => {
 
   // ---------- Register ----------
   const register = async (email, password) => {
-    const response = await fetch("/api/auth-register", {
+    const response = await fetch("/api/auth/register", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ email, password }),
@@ -67,7 +67,7 @@ export const AuthProvider = ({ children }) => {
       return;
     }
 
-    const response = await fetch("/api/auth-refresh", {
+    const response = await fetch("/api/auth/refresh", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ refreshToken }),
@@ -89,7 +89,7 @@ export const AuthProvider = ({ children }) => {
     const refreshToken = localStorage.getItem("refreshToken");
 
     try {
-      await fetch("/api/auth-logout", {
+      await fetch("/api/auth/logout", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ refreshToken }),

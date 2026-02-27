@@ -1,6 +1,6 @@
 # Job Hunt Tracker API
 
-Production-ready serverless backend built using:
+This is a production-ready serverless backend API built using:
 
 - Azure Functions
 - Node.js
@@ -155,16 +155,6 @@ POST /api/applications
 
 ---
 
-# Environment Variables
-
-Required:
-
-DATABASE_URL
-
-JWT_SECRET
-
----
-
 # Tech Architecture
 
 React Frontend  
@@ -176,5 +166,3 @@ Neon PostgreSQL Database
 # Author
 
 Quyen K
-
-Production SaaS Portfolio Project

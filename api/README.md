@@ -10,32 +10,33 @@ This is a production-ready serverless backend API built using:
 ---
 
 # Base URL
+
 Removed for security purposes.
 
 # Overview: Authentication Architecture
 
 React
- ↓
+↓
 POST /api/auth/login
- ↓
+↓
 Azure Functions
- ↓
+↓
 Verify user in Neon
- ↓
+↓
 Return JWT
- ↓
+↓
 React stores JWT
- ↓
+↓
 JWT sent with future API calls
 
 # Production SaaS authentication flow
 
 Register
- ↓
+↓
 Login
- ↓
+↓
 Receive JWT
- ↓
+↓
 Access protected APIs
 
 # JWT Authentication Middleware
@@ -43,6 +44,7 @@ Access protected APIs
 JWT middleware is the security gatekeeper of your API.
 
 It automatically:
+
 - Verifies the JWT is valid
 - Extracts the user identity
 - Blocks unauthorized access
@@ -55,17 +57,18 @@ This is required in any production backend running on Microsoft Azure with a dat
 Production Architecture Flow
 
 Request
- ↓
+↓
 JWT Middleware
- ↓
+↓
 Verified User ID
- ↓
+↓
 API Route
- ↓
+↓
 Database query filtered by user
 
 # Below is a complete production-ready JWT + Refresh Token system for your stack:
 
+test
 Backend: Microsoft Azure Functions
 Database: Neon PostgreSQL
 Frontend: React
@@ -82,20 +85,20 @@ This includes:
 
 Architecture Overview (Enterprise Pattern)
 Login
-  ↓
+↓
 Access Token (15m)
 Refresh Token (30d, stored in DB)
 
 Access expires
-  ↓
+↓
 POST /auth/refresh
-  ↓
+↓
 New Access Token
-  ↓
+↓
 Old refresh token rotated
 
 Logout
-  ↓
+↓
 Delete refresh token from DB
 
 This allows:
@@ -109,7 +112,6 @@ This allows:
 
 Need to implement / upgrade / add: Role-based access control (RBAC) and Refresh tokens, to make it enterprise-level auth
 
-
 ---
 
 # Authentication Endpoints
@@ -121,10 +123,10 @@ POST /api/auth/register
 Body:
 
 {
-  "email": "test@email.com",
-  "password": "password",
-  "first_name": "John",
-  "last_name": "Doe"
+"email": "test@email.com",
+"password": "password",
+"first_name": "John",
+"last_name": "Doe"
 }
 
 ---
@@ -159,7 +161,7 @@ POST /api/applications
 
 React Frontend  
 Azure Functions Backend  
-Neon PostgreSQL Database  
+Neon PostgreSQL Database
 
 ---
 
